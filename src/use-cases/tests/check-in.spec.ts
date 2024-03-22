@@ -2,7 +2,8 @@ import { InMemoryCheckInsRepository } from "@/repositories/in-memory/in-memory-c
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { CheckInUseCase } from "../check-in";
 import { InMemoryGymsRepository } from "@/repositories/in-memory/in-memory-gyms-repository";
-import { Decimal } from "@prisma/client/runtime/library";
+import { MaxNumbersOfCheckIns } from "../errors/max-numbers-of-check-ins";
+import { MaxDistanceError } from "../errors/max-distance-error";
 
 let checkInRepository: InMemoryCheckInsRepository
 let gymsRepository: InMemoryGymsRepository
@@ -10,19 +11,19 @@ let sut: CheckInUseCase
 
 describe('Check-in Use Case', () => {
 
-    beforeEach(() => {
+    beforeEach(async () => {
         checkInRepository = new InMemoryCheckInsRepository()
         gymsRepository = new InMemoryGymsRepository()
         sut = new CheckInUseCase(checkInRepository, gymsRepository)
         vi.useFakeTimers()
 
-        gymsRepository.items.push({
+        await gymsRepository.create({
             id: 'gym-01',
-            title: 'NodeJS Academy',
-            phone: '',
-            description: '',
-            latitude: new Decimal(0),
-            longitude: new Decimal(0)
+            title: 'Ultimate Gym',
+            description: 'NodeJS Gym',
+            phone: null,
+            latitude: -25.474004,
+            longitude: -49.2109824
         })
     })
 
@@ -34,8 +35,8 @@ describe('Check-in Use Case', () => {
         const { checkIn } = await sut.execute({
             userId: 'user-01',
             gymId: 'gym-01',
-            userLatitude: 0,
-            userLongitude: 0
+            userLatitude: -25.474004,
+            userLongitude: -49.2109824
         })
 
         expect(checkIn.id).toEqual(expect.any(String))
@@ -50,18 +51,18 @@ describe('Check-in Use Case', () => {
         await sut.execute({
             userId: 'user-01',
             gymId: 'gym-01',
-            userLatitude: 0,
-            userLongitude: 0
+            userLatitude: -25.474004,
+            userLongitude: -49.2109824
         })
 
         expect(async () => {
             await sut.execute({
                 userId: 'user-01',
                 gymId: 'gym-01',
-                userLatitude: 0,
-            userLongitude: 0
+                userLatitude: -25.474004,
+                userLongitude: -49.2109824
             })
-        }).rejects.toBeInstanceOf(Error)
+        }).rejects.toBeInstanceOf(MaxNumbersOfCheckIns)
     })
 
     it('should be able to check in twice but in different days', async () => {
@@ -70,8 +71,8 @@ describe('Check-in Use Case', () => {
         await sut.execute({
             userId: 'user-01',
             gymId: 'gym-01',
-            userLatitude: 0,
-            userLongitude: 0
+            userLatitude: -25.474004,
+            userLongitude: -49.2109824
         })
 
         vi.setSystemTime(new Date(2022, 0, 5, 8, 0, 0))
@@ -79,8 +80,8 @@ describe('Check-in Use Case', () => {
         const { checkIn } = await sut.execute({
             userId: 'user-01',
             gymId: 'gym-01',
-            userLatitude: 0,
-            userLongitude: 0
+            userLatitude: -25.474004,
+            userLongitude: -49.2109824
         })
 
         expect(checkIn.id).toEqual(expect.any(String))
@@ -88,23 +89,23 @@ describe('Check-in Use Case', () => {
 
     it('should not be able to check in on distant gym', async () => {
 
-        gymsRepository.items.push({
+        await gymsRepository.create({
             id: 'gym-02',
             title: 'NodeJS Academy',
             phone: '',
             description: '',
-            latitude: new Decimal(-25.474004),
-            longitude: new Decimal(-49.2378474)
+            latitude: -25.474004,
+            longitude: -49.2378474
         })
     
         expect(async () => {
             await sut.execute({
                 userId: 'user-01',
                 gymId: 'gym-02',
-                userLatitude: -25.5295488,
+                userLatitude: -25.474004,
                 userLongitude: -49.2109824
             })
-        }).rejects.toBeInstanceOf(Error)
+        }).rejects.toBeInstanceOf(MaxDistanceError)
     
     })
 
