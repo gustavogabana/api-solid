@@ -1,12 +1,12 @@
-import { InMemoryGymsRepository } from "@/repositories/in-memory/in-memory-gyms-repository"
 import { CheckInUseCase } from "../check-in"
-import { InMemoryCheckInsRepository } from "@/repositories/in-memory/in-memory-check-ins-repository"
+import { PrismaCheckInsRepository } from "@/repositories/prisma/prisma-check-ins-repository"
+import { PrismaGymsRepository } from "@/repositories/prisma/prisma-gyms-repository"
 
 // factory pattern = abstrair a criação de objetos sem expor a lógica de criação beneficiando a reutilização
 
 export const makeCheckInUseCase = () => {
-    const checkInsRepository = new InMemoryCheckInsRepository()
-    const gymsRepository = new InMemoryGymsRepository()
+    const checkInsRepository = new PrismaCheckInsRepository()
+    const gymsRepository = new PrismaGymsRepository()
     const useCase = new CheckInUseCase(checkInsRepository, gymsRepository)
 
     return useCase

@@ -1,8 +1,8 @@
-import { InMemoryGymsRepository } from "@/repositories/in-memory/in-memory-gyms-repository"
 import { SearchGymsUseCase } from "../search-gyms"
+import { PrismaGymsRepository } from "@/repositories/prisma/prisma-gyms-repository"
 
 export const makeSearchGymsUseCase = () => {
-    const gymsRepository = new InMemoryGymsRepository()
+    const gymsRepository = new PrismaGymsRepository()
     const useCase = new SearchGymsUseCase(gymsRepository)
 
     return useCase

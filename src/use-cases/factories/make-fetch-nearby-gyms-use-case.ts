@@ -1,8 +1,8 @@
-import { InMemoryGymsRepository } from "@/repositories/in-memory/in-memory-gyms-repository"
 import { FetchNearbyGymsUseCase } from "../fetch-nearby-gyms"
+import { PrismaGymsRepository } from "@/repositories/prisma/prisma-gyms-repository"
 
 export const makeFetchNearbyGymsUseCase = () => {
-    const gymsRepository = new InMemoryGymsRepository()
+    const gymsRepository = new PrismaGymsRepository()
     const useCase = new FetchNearbyGymsUseCase(gymsRepository)
 
     return useCase
