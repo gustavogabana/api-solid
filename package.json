@@ -7,12 +7,8 @@
     "start:dev": "tsx watch src/server.ts",
     "start": "node build/server.js",
     "build": "tsup src --out-dir build",
-    "test:create-prisma-environment": "sudo npm link ./prisma/vitest-environment-test",
-    "test:install-prisma-environment": "npm link vitest-environment-test",
-    "pretest:e2e": "run-s test:create-prisma-environment test:install-prisma-environment",
     "test": "vitest run --dir src/use-cases",
     "test:watch": "vitest --dir src/use-cases",
-    "test:e2e": "vitest run --dir src/http",
     "test:coverage": "vitest run --coverage"
   },
   "keywords": [],
