@@ -20,10 +20,10 @@ model User {
   name String
   email String @unique
   password_hash String
+  role Role @default(MEMBER)
   created_at DateTime @default(now())
 
   checkIns CheckIn[]
-
 }
 
 model CheckIn {
@@ -38,7 +38,6 @@ model CheckIn {
 
   gym Gym @relation(fields: [gym_id], references: [id])
   gym_id String
-
 }
 
 model Gym {
@@ -52,5 +51,9 @@ model Gym {
   longitude Decimal
 
   checkIns CheckIn[]
+}
 
+enum Role {
+  ADMIN
+  MEMBER
 }

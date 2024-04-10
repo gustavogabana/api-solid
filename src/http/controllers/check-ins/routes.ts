@@ -4,6 +4,7 @@ import { create } from "../check-ins/create.controller"
 import { validate } from "./validate.controller"
 import { history } from "./history.controller"
 import { metrics } from "./metrics.controller"
+import { verifyUserRole } from "@/http/middlewares/verify-user-role"
 
 export const checkInsRoutes = async (app: FastifyInstance) => {
     // All routes will pass through the verifyJWT function
@@ -14,5 +15,5 @@ export const checkInsRoutes = async (app: FastifyInstance) => {
 
     app.post("/gyms/:gymId/check-ins", create)
     
-    app.patch("/check-ins/:checkInId/validate", validate)
+    app.patch("/check-ins/:checkInId/validate", {onRequest: [verifyUserRole('ADMIN')]} , validate)
 }
